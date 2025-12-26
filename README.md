@@ -1,88 +1,47 @@
-# 🚗 Car Price Prediction using Machine Learning
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
 
-## 📌 Project Overview
-Car Price Prediction is a machine learning-based project designed to estimate the price of used cars based on important factors such as brand, year, mileage, fuel type, and engine power. This system helps buyers and sellers make informed decisions by providing accurate and reliable price predictions.
+# Load dataset
+data = pd.read_csv("dataset/car_data.csv")
 
-This project is developed as a **Final Year Project** using Python and Machine Learning techniques.
+# Data preprocessing
+data = pd.get_dummies(data, drop_first=True)
 
----
+# Split features and target
+X = data.drop("Selling_Price", axis=1)
+y = data["Selling_Price"]
 
-## 🎯 Objectives
-- To predict used car prices accurately using machine learning models  
-- To analyze key factors affecting car prices  
-- To reduce human errors in manual price estimation  
-- To provide fast and automated price predictions  
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
----
+# Linear Regression Model
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
 
-## 🧠 Machine Learning Models Used
-- **Linear Regression**
-- **Decision Tree Regression**
+# Decision Tree Model
+dt_model = DecisionTreeRegressor(random_state=42)
+dt_model.fit(X_train, y_train)
 
----
+# Predictions
+lr_pred = lr_model.predict(X_test)
+dt_pred = dt_model.predict(X_test)
 
-## 🛠️ Technologies Used
-- **Python**
-- **Pandas**
-- **NumPy**
-- **Scikit-learn**
-- **Matplotlib**
+# Evaluation
+print("Linear Regression MAE:", mean_absolute_error(y_test, lr_pred))
+print("Linear Regression R2 Score:", r2_score(y_test, lr_pred))
 
----
+print("Decision Tree MAE:", mean_absolute_error(y_test, dt_pred))
+print("Decision Tree R2 Score:", r2_score(y_test, dt_pred))
 
-## 📊 Dataset Description
-The dataset consists of used car listings with the following attributes:
-- Car Brand
-- Model Year
-- Fuel Type
-- Mileage
-- Engine Power
-- Selling Price (Target Variable)
+# Save model
+with open("model/car_price_model.pkl", "wb") as file:
+    pickle.dump(dt_model, file)
 
----
-
-## ⚙️ System Architecture
-1. Data Collection  
-2. Data Preprocessing  
-3. Feature Selection  
-4. Model Training  
-5. Model Evaluation  
-6. Price Prediction Output  
-
----
-
-## 📈 Results
-The model provides accurate price predictions with reduced error compared to traditional manual pricing methods.
-
----
-
-## ✅ Advantages
-- Fast and automated predictions  
-- Reduced human error  
-- Consistent and reliable results  
-
----
-
-## 🌍 Applications
-- Used car selling platforms  
-- Online automobile marketplaces  
-- Car dealerships  
-
----
-
-## 🔮 Future Enhancements
-- Web or Mobile Application integration  
-- Real-time market price updates  
-- Deep learning-based prediction models  
-
----
-
-## 👨‍💻 Developed By
-**VM. Vasanth**  
-B.Sc Computer Science (Artificial Intelligence)  
-PPG College of Arts and Science  
-
----
-
-## 📜 License
-This project is for educational purposes only.
+print("Model saved successfully!")
